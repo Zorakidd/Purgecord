@@ -14,7 +14,7 @@
 // @downloadURL     https://github.com/Zorakidd/Purgecord/main/purgecord.user.js
 // @contributionURL https://ko-fi.com/zora_kidd
 // @grant           none
-// @attribution     Based on victornpb (https://github.com/victornpb/purgecord), MIT-License
+// @attribution     Based on victornpb (https://github.com/victornpb/undiscord), MIT-License
 
 // ==/UserScript==
 (function () {
@@ -110,7 +110,7 @@
 #purgecord .main { display: flex; max-width: calc(100% - 250px); background-color: var(--bg-overlay-chat, var(--background-base-lower)); flex-grow: 1; }
 #purgecord.hide-sidebar .sidebar { display: none; }
 #purgecord.hide-sidebar .main { max-width: 100%; }
-#purgecord #logArea { font-family: Consolas, Liberation Mono, Menlo, Courier, monospace; font-size: 0.75rem; overflow: auto; padding: 10px; user-select: text; flex-grow: 1; flex-grow: 1; cursor: auto; }
+#purgecord #logArea { font-family: Consolas, Liberation Mono, Menlo, Courier, monospace; font-size: 0.75rem; overflow: auto; padding: 10px; user-select: text; flex-grow: 1; cursor: auto; }
 #purgecord .tbar { padding: 8px; background-color: var(--bg-overlay-2, var(--__header-bar-background)); }
 #purgecord .tbar button { margin-right: 4px; margin-bottom: 4px; }
 #purgecord .footer { cursor: se-resize; padding-right: 30px; }
@@ -481,15 +481,15 @@
 
   /**
    * Delete all messages in a Discord channel or DM
-   * @author Zora <https://www.github.com/zorakidd>
-   * @see https://github.com/zorakidd/purgecord
+   * @author Zora <https://www.github.com/Zorakidd>
+   * @see https://github.com/Zorakidd/Purgecord
    */
-  // API-Basis dynamisch aus Discord lesen, mit Fallback
+  // Read the API base dynamically from Discord, with a fallback
   function apiBase() {
     try {
       const env = window.GLOBAL_ENV;
       if (env?.API_ENDPOINT && env?.API_VERSION) {
-        // API_ENDPOINT ist z.B. "//discord.com/api"
+        // API_ENDPOINT is e.g. "//discord.com/api"
         return `${location.protocol}${env.API_ENDPOINT}/v${env.API_VERSION}`;
       }
     } catch (e) {
@@ -525,7 +525,7 @@
       offset: 0,
       iterations: 0,
 
-      _seachResponse: null,
+      _searchResponse: null,
       _messagesToDelete: [],
       _skippedMessages: [],
     };
@@ -585,7 +585,7 @@
         offset: 0,
         iterations: 0,
 
-        _seachResponse: null,
+        _searchResponse: null,
         _messagesToDelete: [],
         _skippedMessages: [],
       };
@@ -597,7 +597,7 @@
     async runBatch(queue) {
       if (this.state.running) return log.error("Already running!");
 
-      log.info(`Runnning batch with queue of ${queue.length} jobs`);
+      log.info(`Running batch with queue of ${queue.length} jobs`);
       for (let i = 0; i < queue.length; i++) {
         const job = queue[i];
         log.info("Starting job...", `(${i + 1}/${queue.length})`);
@@ -660,7 +660,7 @@
 
         log.verb(
           `Grand total: ${this.state.grandTotal}`,
-          `(Messages in current page: ${this.state._seachResponse.messages.length}`,
+          `(Messages in current page: ${this.state._searchResponse.messages.length}`,
           `To be deleted: ${this.state._messagesToDelete.length}`,
           `Skipped: ${this.state._skippedMessages.length})`,
           `offset: ${this.state.offset}`,
@@ -675,7 +675,7 @@
         if (this.state._messagesToDelete.length > 0) {
           if ((await this.confirm()) === false) {
             this.state.running = false; // break out of a job
-            break; // immmediately stop this iteration
+            break; // immediately stop this iteration
           }
 
           await this.deleteMessagesFromList();
@@ -688,8 +688,8 @@
             "There's nothing we can delete on this page, checking next page...",
           );
           log.verb(
-            `Skipped ${this.state._skippedMessages.length} out of ${this.state._seachResponse.messages.length} in this page.`,
-            `(Offset was ${oldOffset}, ajusted to ${this.state.offset})`,
+            `Skipped ${this.state._skippedMessages.length} out of ${this.state._searchResponse.messages.length} in this page.`,
+            `(Offset was ${oldOffset}, adjusted to ${this.state.offset})`,
           );
         } else {
           log.verb("Ended because API returned an empty page.");
@@ -729,7 +729,7 @@
         (this.options.deleteDelay + this.stats.avgPing) * this.state.grandTotal;
     }
 
-    /** As for confirmation in the beggining process */
+    /** Ask for confirmation at the beginning of the process */
     async confirm() {
       if (!this.options.askForConfirmation) return true;
 
@@ -815,11 +815,11 @@
       if (resp.status === 202) {
         this._searchStreak = 0;
         let w = (await resp.json()).retry_after * 1000;
-        w = Math.max(w || this.options.searchDelay, 1000); // options statt stats + Floor
+        w = Math.max(w || this.options.searchDelay, 1000); // use options, not stats + floor
         this.stats.throttledCount++;
         this.stats.throttledTotalTime += w;
         log.warn(
-          `Channel ist noch nicht indexiert. Warte ${w}ms, damit Discord ihn indexiert ...`,
+          `Channel is not indexed yet. Waiting ${w}ms for Discord to index it ...`,
         );
         await wait(w);
         return await this.search();
@@ -833,13 +833,13 @@
           w = w || this.options.searchDelay;
           this.stats.throttledCount++;
           this.stats.throttledTotalTime += w;
-          this.options.searchDelay += w; // options statt stats
+          this.options.searchDelay += w; // use options, not stats
           w = this.options.searchDelay;
           log.warn(
-            `Rate-Limit bei der Suche! Erhöhe Such-Delay auf ${w}ms ...`,
+            `Rate limited while searching! Increasing search delay to ${w}ms ...`,
           );
           this.printStats();
-          log.verb(`Abkühlphase ${w * 2}ms vor erneutem Versuch ...`);
+          log.verb(`Cooling down for ${w * 2}ms before retrying ...`);
           await wait(Math.max(w * 2, 1000));
           return await this.search();
         } else {
@@ -860,13 +860,13 @@
       if (this._searchStreak % 5 === 0) this.easeDelay("search");
 
       const data = await resp.json();
-      this.state._seachResponse = data;
+      this.state._searchResponse = data;
       console.log(PREFIX$1, "search", data);
       return data;
     }
 
     async filterResponse() {
-      const data = this.state._seachResponse;
+      const data = this.state._searchResponse;
 
       // the search total will decrease as we delete stuff
       const total = data.total_results;
@@ -1387,7 +1387,7 @@ body.purgecord-pick-message.after [id^="message-content-"]:hover::after {
   window.messagePicker = messagePicker;
 
   function getToken() {
-    // 1) schneller iframe-Versuch (klappt bei aktuellem Discord meist nicht mehr, schadet aber nicht)
+    // 1) quick iframe attempt (usually no longer works on current Discord, but doesn't hurt to try)
     try {
       const iframe = document.body.appendChild(
         document.createElement("iframe"),
@@ -1396,10 +1396,10 @@ body.purgecord-pick-message.after [id^="message-content-"]:hover::after {
       iframe.remove();
       if (ls && ls.token) return JSON.parse(ls.token);
     } catch (e) {
-      /* weiter */
+      /* continue */
     }
 
-    // 2) robust: webpack-Modul mit getToken() suchen
+    // 2) robust: search webpack modules for getToken()
     let token;
     try {
       window.webpackChunkdiscord_app.push([
@@ -1423,7 +1423,7 @@ body.purgecord-pick-message.after [id^="message-content-"]:hover::after {
         },
       ]);
     } catch (e) {
-      log.error("webpack-Token-Suche fehlgeschlagen:", e);
+      log.error("webpack token search failed:", e);
     }
     return token;
   }
@@ -1471,8 +1471,8 @@ body.purgecord-pick-message.after [id^="message-content-"]:hover::after {
   // -------------------------- User interface ------------------------------- //
 
   // links
-  const HOME = "https://github.com/zorakidd/purgecord";
-  const WIKI = "https://github.com/zorakidd/purgecord/wiki";
+  const HOME = "https://github.com/Zorakidd/Purgecord";
+  const WIKI = "https://github.com/Zorakidd/Purgecord/wiki";
 
   const purgecordCore = new PurgecordCore();
   messagePicker.init();
