@@ -21,7 +21,7 @@
   "use strict";
 
   /* rollup-plugin-baked-env */
-  const VERSION = "5.3.1-zora";
+  const VERSION = "5.3.1";
 
   var themeCss = `
 /* purgecord window */
