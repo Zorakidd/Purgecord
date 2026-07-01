@@ -11,7 +11,7 @@
 // @match           https://*.discord.com/login
 // @license         MIT
 // @icon            https://victornpb.github.io/undiscord/images/icon128.png
-// @downloadURL     https://github.com/Zorakidd/Purgecord/master/purgecord.user.js
+// @downloadURL     https://github.com/Zorakidd/Purgecord/main/purgecord.user.js
 // @contributionURL https://ko-fi.com/zora_kidd
 // @grant           none
 // @attribution     Based on victornpb (https://github.com/victornpb/purgecord), MIT-License
