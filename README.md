@@ -59,7 +59,7 @@ Bugs, ideas, improvements are welcome. Take a quick look at [CONTRIBUTING.md](./
 
 ## License
 
-MIT. See [LICENSE](./LICENSE). Based on Undiscord by Victor Nascimento (victornpb), also MIT.
+MIT. See [LICENSE](./LICENSE). Based on Undiscord by Victor (victornpb), also MIT.
 
 ## Disclaimer
 
